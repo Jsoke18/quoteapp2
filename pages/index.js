@@ -1,71 +1,35 @@
-import { useCallback, useEffect, useState } from 'react'
-import Button from '../components/Button'
-import ClickCount from '../components/ClickCount'
-import styles from '../styles/home.module.css'
+import { useState } from 'react';
+import axios from 'axios';
+import QuoteForm from './QuoteForm';
 
-function throwError() {
-  console.log(
-    // The function body() is not defined
-    document.body()
-  )
-}
+export default function Home() {
+  const [quote, setQuote] = useState(null);
 
-function Home() {
-  const [count, setCount] = useState(0)
-  const increment = useCallback(() => {
-    setCount((v) => v + 1)
-  }, [setCount])
-
-  useEffect(() => {
-    const r = setInterval(() => {
-      increment()
-    }, 1000)
-
-    return () => {
-      clearInterval(r)
-    }
-  }, [increment])
+  const calculateQuote = async (input) => {
+    const response = await axios.post('/api/calculate', input);
+    setQuote(response.data);
+  };
 
   return (
-    <main className={styles.main}>
-      <h1>Fast Refresh Demo</h1>
-      <p>
-        Fast Refresh is a Next.js feature that gives you instantaneous feedback
-        on edits made to your React components, without ever losing component
-        state.
-      </p>
-      <hr className={styles.hr} />
-      <div>
-        <p>
-          Auto incrementing value. The counter won't reset after edits or if
-          there are errors.
-        </p>
-        <p>Current value: {count}</p>
-      </div>
-      <hr className={styles.hr} />
-      <div>
-        <p>Component with state.</p>
-        <ClickCount />
-      </div>
-      <hr className={styles.hr} />
-      <div>
-        <p>
-          The button below will throw 2 errors. You'll see the error overlay to
-          let you know about the errors but it won't break the page or reset
-          your state.
-        </p>
-        <Button
-          onClick={(e) => {
-            setTimeout(() => document.parentNode(), 0)
-            throwError()
-          }}
-        >
-          Throw an Error
-        </Button>
-      </div>
-      <hr className={styles.hr} />
-    </main>
-  )
+    <div>
+      <QuoteForm onCalculate={calculateQuote} />
+      {quote && (
+        <div>
+          <h2>Quote:</h2>
+          <p>Rep: {quote.rep}</p>
+          <p>Product: {quote.product}</p>
+          <p>Weight: {quote.weight}</p>
+          <p>Divider: {quote.divider}</p>
+          <p>Vendor: {quote.vendor}</p>
+          <p>Alloy: {quote.alloy}</p>
+          <p>Cost After Tariff: {quote.cost_after_tariff}</p>
+          <p>Price Per Pound After Tariff: {quote.price_per_pound_after_Tariff}</p>
+          <p>Cost After Overhead: {quote.cost_after_overhead}</p>
+          <p>Price Per Pound After Overhead: {quote.price_per_pound_after_overhead}</p>
+          <p>Cost After Divider: {quote.cost_after_divider}</p>
+          <p>Price Per Pound After Divider: {quote.price_per_pound_after_divider}</p>
+        </div>
+      )}
+    </div>
+  );
 }
-
-export default Home
